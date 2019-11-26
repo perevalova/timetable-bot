@@ -35,91 +35,94 @@ def parse_text(text):
     com = re.search(pattern, text).group()
     return com[1:]
 
-def schedule(message):
+def timetable(message):
     my_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(my_dir, 'schedule.json')
-    berezivka = ''
-    if 'berezivka' in message:
+    answer_string = ''
+    if 'bs1' in message:
         with open(json_file_path, 'r') as f:
             d = json.load(f)
-            for x in d['Berezivka']:
+            for x in d['BS1']:
                 pr = ' - '.join(x)
-                berezivka += f'{pr}\n'
-            return berezivka
+                answer_string += f'{pr}\n'
+            return answer_string
+    elif 'berezivka' in message:
+        with open(json_file_path, 'r') as f:
+            d = json.load(f)
+            for x in d['answer_string']:
+                pr = ' - '.join(x)
+                answer_string += f'{pr}\n'
+            return answer_string
     elif 'now_br' in message:
         with open(json_file_path, 'r') as f:
             d = json.load(f)
             cur_time = datetime.now().time()
-            for i in range(len(d['Berezivka'])-1):
-                k = d['Berezivka'][i]
-                l = d['Berezivka'][i+1]
+            for i in range(len(d['answer_string'])-1):
+                k = d['answer_string'][i]
+                l = d['answer_string'][i+1]
                 time_obj = datetime.strptime(k[0],
                                                     '%H:%M').time()
                 time_obj2 = datetime.strptime(l[0],
                                                     '%H:%M').time()
                 if time_obj < cur_time < time_obj2:
-                    pr = ' - '.join(d['Berezivka'][i])
-                    nx1 = ' - '.join(d['Berezivka'][i+1])
-                    nx2 = ' - '.join(d['Berezivka'][i+2])
-                    berezivka += f'Попередній: {pr}\n'
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
+                    pr = ' - '.join(d['answer_string'][i])
+                    nx1 = ' - '.join(d['answer_string'][i+1])
+                    nx2 = ' - '.join(d['answer_string'][i+2])
+                    answer_string += f'Попередній: {pr}\n'
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
                 elif time_obj == cur_time:
-                    pr = ' - '.join(d['Berezivka'][i-1])
-                    nw = ' - '.join(d['Berezivka'][i])
-                    nx1 = ' - '.join(d['Berezivka'][i+1])
-                    nx2 = ' - '.join(d['Berezivka'][i+2])
-                    berezivka += f'Попередній: {pr}\n'
-                    berezivka += f'Зараз: {nw}\n'
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
+                    pr = ' - '.join(d['answer_string'][i-1])
+                    nw = ' - '.join(d['answer_string'][i])
+                    nx1 = ' - '.join(d['answer_string'][i+1])
+                    nx2 = ' - '.join(d['answer_string'][i+2])
+                    answer_string += f'Попередній: {pr}\n'
+                    answer_string += f'Зараз: {nw}\n'
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
                 elif cur_time < time_obj:
-                    nx1 = ' - '.join(d['Berezivka'][i])
-                    nx2 = ' - '.join(d['Berezivka'][i+1])
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
-                # elif time_obj < cur_time:
-                #     return 'На сьогодні автобусів більше немає'
+                    nx1 = ' - '.join(d['answer_string'][i])
+                    nx2 = ' - '.join(d['answer_string'][i+1])
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
     else:
         with open(json_file_path, 'r') as f:
             d = json.load(f)
             cur_time = datetime.strptime(message, '%H:%M').time()
-            for i in range(len(d['Berezivka'])-1):
-                k = d['Berezivka'][i]
-                l = d['Berezivka'][i+1]
+            for i in range(len(d['answer_string'])-1):
+                k = d['answer_string'][i]
+                l = d['answer_string'][i+1]
                 time_obj = datetime.strptime(k[0],
                                                     '%H:%M').time()
                 time_obj2 = datetime.strptime(l[0],
                                                     '%H:%M').time()
                 if time_obj < cur_time < time_obj2:
-                    pr = ' - '.join(d['Berezivka'][i])
-                    nx1 = ' - '.join(d['Berezivka'][i+1])
-                    nx2 = ' - '.join(d['Berezivka'][i+2])
-                    berezivka += f'Попередній: {pr}\n'
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
+                    pr = ' - '.join(d['answer_string'][i])
+                    nx1 = ' - '.join(d['answer_string'][i+1])
+                    nx2 = ' - '.join(d['answer_string'][i+2])
+                    answer_string += f'Попередній: {pr}\n'
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
                 elif time_obj == cur_time:
-                    pr = ' - '.join(d['Berezivka'][i-1])
-                    nw = ' - '.join(d['Berezivka'][i])
-                    nx1 = ' - '.join(d['Berezivka'][i+1])
-                    nx2 = ' - '.join(d['Berezivka'][i+2])
-                    berezivka += f'Попередній: {pr}\n'
-                    berezivka += f'Зараз: {nw}\n'
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
+                    pr = ' - '.join(d['answer_string'][i-1])
+                    nw = ' - '.join(d['answer_string'][i])
+                    nx1 = ' - '.join(d['answer_string'][i+1])
+                    nx2 = ' - '.join(d['answer_string'][i+2])
+                    answer_string += f'Попередній: {pr}\n'
+                    answer_string += f'Зараз: {nw}\n'
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
                 elif cur_time < time_obj:
-                    nx1 = ' - '.join(d['Berezivka'][i])
-                    nx2 = ' - '.join(d['Berezivka'][i+1])
-                    berezivka += f'Наступний: {nx1}\n'
-                    berezivka += f'Наступний: {nx2}\n'
-                    return berezivka
-                # elif time_obj < cur_time:
-                #     return 'На сьогодні автобусів більше немає'
+                    nx1 = ' - '.join(d['answer_string'][i])
+                    nx2 = ' - '.join(d['answer_string'][i+1])
+                    answer_string += f'Наступний: {nx1}\n'
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -132,12 +135,30 @@ def index():
         if re.search(pattern, message):
             mess = parse_text(message)
             if mess == 'start':
-                send_message(chat_id, text='Оберіть команду в меню')
+                text = 'Вітаю! Цей бот призначений для орієнтації в часі пересування \
+                громадського транспорту для села Березівка.'
+                text2 = 'Доступні команди: \n' \
+                        '/now - Відправляються в найближчий час з Житомира АС2 \n' \
+                        '/now_bs1 - Відправляються в найближчий час з Житомира АС1 \n' \
+                        '/now_zt - Відправляються в найближчий час з Житомира \n' \
+                        '/now_br - Відправляються в найближчий час з Березівки \n' \
+                        '/zhytomyr - Усі автобуси з Житомира \n' \
+                        '/busstasion1 - Усі автобуси з Житомира АС1 \n' \
+                        '/busstasion2 - Усі автобуси з Житомира АС2 \n' \
+                        '/berezivka - Усі автобуси з Березівки \n' \
+                        'Також Ви можете ввести пункт відправлення та бажаний час ' \
+                        ' у форматі "години:хвилини" для того, щоб запланувати поїздку: \n' \
+                        'житомир 14:00 - Запланована поїздка з Житомира \n' \
+                        'ас1 14:00 - Запланована поїздка з Житомира АС1 \n' \
+                        'ас2 14:00 - Запланована поїздка з Житомира АС2 \n' \
+                        'березівка 14:00 - Запланована поїздка з Березівки'
+                send_message(chat_id, text=text)
+                send_message(chat_id, text=text2)
             else:
-                bus = schedule(mess)
+                bus = timetable(mess)
                 send_message(chat_id, text=bus)
         else:
-            bus = schedule(message)
+            bus = timetable(message)
             send_message(chat_id, text=bus)
         return jsonify(r)
     return '<h1>Bot welcomes you</h1>'
