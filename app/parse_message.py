@@ -22,26 +22,18 @@ def find_bus(sel_time, keyword):
         d = json.load(f)
         for i in range(len(d[keyword]) - 1):
             sel_item = d[keyword][i]
-            next_item = d[keyword][i + 1]
+            try:
+                next_item = d[keyword][i + 1]
+                time_next_item = datetime.strptime(next_item[0],
+                                          '%H:%M').time()
+            except KeyError:
+                continue
             last_bus = d[keyword][-1]
             time_sel_item = datetime.strptime(sel_item[0],
                                          '%H:%M').time()
-            time_next_item = datetime.strptime(next_item[0],
-                                          '%H:%M').time()
             time_last_bus = datetime.strptime(last_bus[0],
                                           '%H:%M').time()
-            if time_sel_item < sel_time < time_next_item:
-                pr = ' - '.join(d[keyword][i])
-                nx1 = ' - '.join(d[keyword][i + 1])
-                answer_string += f'Попередній: {pr}\n'
-                answer_string += f'Наступний: {nx1}\n'
-                try:
-                    nx2 = ' - '.join(d[keyword][i + 2])
-                    answer_string += f'Наступний: {nx2}\n'
-                    return answer_string
-                except IndexError:
-                    return answer_string
-            elif time_sel_item == sel_time:
+            if time_sel_item == sel_time:
                 pr = ' - '.join(d[keyword][i - 1])
                 nw = ' - '.join(d[keyword][i])
                 answer_string += f'Попередній: {pr}\n'
@@ -53,7 +45,18 @@ def find_bus(sel_time, keyword):
                     answer_string += f'Наступний: {nx2}\n'
                     return answer_string
                 except IndexError:
-                    return print(answer_string)
+                    return answer_string
+            elif time_sel_item < sel_time < time_next_item:
+                pr = ' - '.join(d[keyword][i])
+                nx1 = ' - '.join(d[keyword][i + 1])
+                answer_string += f'Попередній: {pr}\n'
+                answer_string += f'Наступний: {nx1}\n'
+                try:
+                    nx2 = ' - '.join(d[keyword][i + 2])
+                    answer_string += f'Наступний: {nx2}\n'
+                    return answer_string
+                except IndexError:
+                    return answer_string
             elif sel_time < time_sel_item:
                 nx1 = ' - '.join(d[keyword][i])
                 nx2 = ' - '.join(d[keyword][i + 1])
@@ -78,19 +81,16 @@ def timetable(message):
     bus_list = {
         ('bs1', 'ас1'): 'busstation1',
         ('bs2', 'ас2'): 'busstation2',
-        ('zt', 'житомир'): 'zhytomyr',
         ('br', 'березівка'): 'berezivka',
     }
     bus_list1 = {
         'ас1': 'busstation1',
         'ас2': 'busstation2',
-        'житомир': 'zhytomyr',
         'березівка': 'berezivka',
     }
     bus_list2 = {
         'bs1': 'busstation1',
         'bs2': 'busstation2',
-        'zt': 'zhytomyr',
         'br': 'berezivka',
     }
     # for current time
@@ -120,8 +120,10 @@ def timetable(message):
 
 
 def main():
-    but = timetable('busstation2')
-    print(but)
+    # but = timetable('березівка 19:10')
+    # timetable('березівка 20:15')
+    timetable('березівка 19:03')
+    # print(but)
 
 
 if __name__ == '__main__':

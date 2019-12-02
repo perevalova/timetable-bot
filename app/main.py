@@ -175,11 +175,25 @@ def index():
                         'березівка 14:00 - Запланована поїздка з Березівки'
                 send_message(chat_id, text=text)
                 send_message(chat_id, text=text2)
+            elif mess == 'help':
+                text = 'Доступні команди: \n' \
+                        '/now_bs1 - Найближчий з Житомира АС1 (Центральний) \n' \
+                        '/now_bs2 - Найближчий з Житомира АС2 (Житній) \n' \
+                        '/now_br - Найближчий з Березівки \n' \
+                        '/busstation1 - Автобуси з Житомира АС1 (Центральний) \n' \
+                        '/busstation2 - Автобуси з Житомира АС2 (Житній) \n' \
+                        '/berezivka - Автобуси з Березівки \n' \
+                        'Також Ви можете ввести пункт відправлення та бажаний час ' \
+                        ' у форматі "години:хвилини" для того, щоб запланувати поїздку: \n' \
+                        'ас1 14:00 - Запланована поїздка з Житомира АС1 (Центральний) \n' \
+                        'ас2 14:00 - Запланована поїздка з Житомира АС2 (Житній) \n' \
+                        'березівка 14:00 - Запланована поїздка з Березівки'
+                send_message(chat_id, text=text)
             else:
                 bus = timetable(mess)
                 send_message(chat_id, text=bus)
         else:
-            bus = timetable(message)
+            bus = timetable(message.lower())
             send_message(chat_id, text=bus)
         return jsonify(r)
     return '<h1>Bot welcomes you</h1>'
