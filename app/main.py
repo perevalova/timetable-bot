@@ -1,16 +1,17 @@
 import json
-from datetime import datetime
 import os
 import re
-
+import time
 import requests
+from datetime import datetime
+
 from flask import Flask
 from flask import jsonify
 from flask import request
-
 from flask_sslify import SSLify
-import time
-from bot.config import token
+
+from .config import token
+
 
 os.environ["TZ"] = "Europe/Kiev"
 time.tzset()
@@ -20,24 +21,37 @@ sslify = SSLify(app)
 
 URL = f'https://api.telegram.org/bot{token}'
 
+
 def write_json(data, filename='answer.json'):
     with open(filename, 'w') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
+
 def send_message(chat_id, text='Hello'):
+    """
+    Sending message to user
+
+    :param chat_id: int - ID for chat
+    :param text: str - text for sending
+    :return: JSON response
+    """
     url = f'{URL}/sendMessage'
     answer = {'chat_id': chat_id, 'text': text}
     r = requests.post(url, json=answer)
+
     return r.json()
+
 
 def parse_text(text):
     pattern = r'/\w+'
     com = re.search(pattern, text).group()
     return com[1:]
 
+
 # contains file with timetable
 my_dir = os.path.dirname(__file__)
 json_file_path = os.path.join(my_dir, 'schedule.json')
+
 
 def find_bus(sel_time, keyword):
     """
@@ -54,11 +68,11 @@ def find_bus(sel_time, keyword):
             next_item = d[keyword][i + 1]
             last_bus = d[keyword][-1]
             time_sel_item = datetime.strptime(sel_item[0],
-                                         '%H:%M').time()
+                                              '%H:%M').time()
             time_next_item = datetime.strptime(next_item[0],
-                                          '%H:%M').time()
+                                               '%H:%M').time()
             time_last_bus = datetime.strptime(last_bus[0],
-                                          '%H:%M').time()
+                                              '%H:%M').time()
             if time_sel_item < sel_time < time_next_item:
                 pr = ' - '.join(d[keyword][i])
                 nx1 = ' - '.join(d[keyword][i + 1])
@@ -92,11 +106,12 @@ def find_bus(sel_time, keyword):
             elif time_last_bus < sel_time:
                 return 'На сьогодні автобусів більше немає'
 
+
 def all_buses(keyword):
     """
     Take 1 argument
     :param keyword: name of list
-    :return: List of all buses
+    :return: list of all buses
     """
     answer_string = ''
     with open(json_file_path, 'r') as f:
@@ -105,6 +120,7 @@ def all_buses(keyword):
             pr = ' - '.join(x)
             answer_string += f'{pr}\n'
         return answer_string
+
 
 def timetable(message):
     bus_list = {
@@ -123,9 +139,9 @@ def timetable(message):
         'br': 'berezivka',
     }
     # for current time
-    if message in  ['now_bs1', 'now_bs2', 'now_br']:
-        sel_time = datetime.now().time()
-        sel_list = message[message.find('_'):][1:]
+    if message in ['now_bs1', 'now_bs2', 'now_br']:
+        sel_time = datetime.now().time() # get current time
+        sel_list = message[message.find('_'):][1:] # find out
         for i in bus_list2:
             keyword = bus_list2[sel_list]
         answer = find_bus(sel_time, keyword)
@@ -177,17 +193,17 @@ def index():
                 send_message(chat_id, text=text2)
             elif mess == 'help':
                 text = 'Доступні команди: \n' \
-                        '/now_bs1 - Найближчий з Житомира АС1 (Центральний) \n' \
-                        '/now_bs2 - Найближчий з Житомира АС2 (Житній) \n' \
-                        '/now_br - Найближчий з Березівки \n' \
-                        '/busstation1 - Автобуси з Житомира АС1 (Центральний) \n' \
-                        '/busstation2 - Автобуси з Житомира АС2 (Житній) \n' \
-                        '/berezivka - Автобуси з Березівки \n' \
-                        'Також Ви можете ввести пункт відправлення та бажаний час ' \
-                        ' у форматі "години:хвилини" для того, щоб запланувати поїздку: \n' \
-                        'ас1 14:00 - Запланована поїздка з Житомира АС1 (Центральний) \n' \
-                        'ас2 14:00 - Запланована поїздка з Житомира АС2 (Житній) \n' \
-                        'березівка 14:00 - Запланована поїздка з Березівки'
+                       '/now_bs1 - Найближчий з Житомира АС1 (Центральний) \n' \
+                       '/now_bs2 - Найближчий з Житомира АС2 (Житній) \n' \
+                       '/now_br - Найближчий з Березівки \n' \
+                       '/busstation1 - Автобуси з Житомира АС1 (Центральний) \n' \
+                       '/busstation2 - Автобуси з Житомира АС2 (Житній) \n' \
+                       '/berezivka - Автобуси з Березівки \n' \
+                       'Також Ви можете ввести пункт відправлення та бажаний час ' \
+                       ' у форматі "години:хвилини" для того, щоб запланувати поїздку: \n' \
+                       'ас1 14:00 - Запланована поїздка з Житомира АС1 (Центральний) \n' \
+                       'ас2 14:00 - Запланована поїздка з Житомира АС2 (Житній) \n' \
+                       'березівка 14:00 - Запланована поїздка з Березівки'
                 send_message(chat_id, text=text)
             else:
                 bus = timetable(mess)
